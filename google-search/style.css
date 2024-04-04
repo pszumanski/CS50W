@@ -1,0 +1,144 @@
+.links {
+    margin-bottom: 10vh;
+}
+
+.links div {
+    display: flex;
+    justify-content: right;
+}
+
+body * {
+    margin-bottom: 10px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.left {
+    margin-left: 20px;
+    display: flex;
+    justify-content: left;
+    text-align: left;
+}
+
+.right {
+    display: flex;
+    justify-content: right;
+    text-align: right;
+}
+
+div .left label {
+    width: 15vw;
+}
+
+div .left input {
+    position: relative;
+}
+
+.search-button {
+    background-color: #faf9f9;
+    border: none;
+    border-radius: 5px;
+    height: 35px;
+    width: 9vw;
+    color: #313131;
+}
+
+.search-button:hover {
+    border: 1px solid hsl(0, 5%, 70%);
+}
+
+#logo {
+    font-family: "Source Sans 3", serif;
+    font-size: 12vh;
+    font-weight: 550;
+    letter-spacing: -5px;
+    margin-left: 20px;
+}
+
+#logo.left {
+    font-size: 6vh;
+    letter-spacing: -3px;
+    margin-left: 40px;
+}
+
+.left span label {
+    margin-left: 20px;
+    font-size: 1.4em;
+}
+
+#search-container * {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+input[type=text] {
+    width: 40vw;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    height: 3vh;
+}
+
+input[type=text]:focus {
+    border-color: #076fc4;
+}
+
+label {
+    font-family: sans-serif;
+    margin-top: 6px;
+}
+
+input[type=text].input-round {
+    border: 1px solid hsl(0, 5%, 70%);
+    border-radius: 100px;
+    padding-left: 25px;
+    padding-right: 25px;
+    font-size: 18px;
+    height: 5vh;
+}
+
+.input-round:hover {
+    box-shadow: 0 0 5px 3px rgba(197, 197, 197, 0.5);
+}
+
+.input-round:focus {
+    box-shadow: 0 0 5px 3px rgba(197, 197, 197, 0.5);
+}
+
+#advanced-search-button {
+    background-color: hsl(210, 75%, 60%);
+    color: white;
+    font-weight: bolder;
+    font-size: 0.7em;
+}
+
+#advanced-search-button:hover {
+    background-color: hsl(210, 75%, 55%);
+}
+
+.red {
+    color: hsl(0, 75%, 56%);
+}
+
+.blue {
+    color: hsl(210, 75%, 60%);
+}
+
+.yellow {
+    color: hsl(46, 89%, 57%);
+}
+
+.green {
+    color: hsl(135, 51%, 41%);
+}
+
+#intro {
+    font-size: 1.4em;
+    text-align: left;
+}
+
