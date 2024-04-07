@@ -1,0 +1,13 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    {{ title }} Not Found
+{% endblock %}
+
+{% block body %}
+
+    {{ content | safe }}
+
+    <a href="{% url 'new' %}">Create</a>
+
+{% endblock %}
