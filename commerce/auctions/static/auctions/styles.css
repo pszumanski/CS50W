@@ -1,0 +1,42 @@
+body {
+    padding: 10px;
+}
+
+.center h2 {
+    margin-bottom: 35px;
+}
+
+form {
+    margin: auto;
+    align-content: center;
+}
+
+form p label {
+    font-weight: bolder;
+}
+
+form p input {
+    border: 2px solid gray;
+    border-radius: 7px;
+}
+
+form input[type='submit'] {
+    font-weight: bolder;
+    border-radius: 10px;
+    padding-bottom: 8px;
+}
+
+form p textarea {
+    display: block;
+    border: 2px solid gray;
+    border-radius: 7px;
+    width: 60vw;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
