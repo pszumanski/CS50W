@@ -1,0 +1,40 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ auction.title }}</h2>
+    <div>
+        {% if auction.image_url %}
+            <img class="solo-image" src="{{ auction.image_url }}" alt="Picture of {{ auction.title }}">
+            {{ auction.description }}
+        {% endif %}
+    </div>
+    <div>
+        <h3>Price:
+            {% if current_bid %}
+            ${{ current_bid.bid }}
+            {% else %}
+            ${{ auction.starting_bid }}
+            {% endif %}
+        </h3>
+        {{ bids_count }} bid(s) so far.
+        {% if current_bid %}
+            {% if current_bid.bidder == user %}
+                Your bid is the current bid.
+            {% endif %}
+        {% endif %}
+
+    </div>
+    <div>
+        <h4>Details</h4>
+        <ul>
+            <li>List by: {{ auction.seller }} </li>
+            <li>Category:
+                {% if auction.category %}
+                    <a href="categories/{{ auction.category.id }}">{{ auction.category }}</a>
+                {% else %}
+                    No Category Listed
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+{% endblock %}

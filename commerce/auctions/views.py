@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -5,12 +7,21 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
 from .forms import AuctionForm
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    bids = {}
+    for auction in Auction.objects.all():
+        bids[auction] = [auction.starting_bid]
+    for bid in Bid.objects.all():
+        bids[bid.auction].append(bid)
+
+    return render(request, "auctions/index.html", {
+        "auctions": Auction.objects.all(),
+        "bids": bids
+    })
 
 
 def login_view(request):
@@ -71,10 +82,15 @@ def new_auction(request):
         form = AuctionForm(request.POST)
 
         if form.is_valid():
-
-            auction = form.cleaned_data["auction"]
-
-            auction.save()
+            new_auction = Auction(
+                title=form.cleaned_data["title"],
+                description=form.cleaned_data["description"],
+                seller=request.user,
+                starting_bid=form.cleaned_data["starting_bid"],
+                category=form.cleaned_data["category"],
+                image_url=form.cleaned_data["image_url"],
+            )
+            new_auction.save()
 
             return HttpResponseRedirect(reverse("index"))
         else:
@@ -83,4 +99,39 @@ def new_auction(request):
             })
     return render(request, "auctions/new_auction.html", {
         "form": AuctionForm()
+    })
+
+
+def auction(request, auction_id):
+    selected_auction = Auction.objects.get(id=auction_id)
+    current_bid = Bid.objects.filter(auction=selected_auction).last()
+    return render(request, "auctions/auction.html", {
+        "user": request.user,
+        "auction": selected_auction,
+        "comments": Comment.objects.filter(auction=selected_auction),
+        "bids_count": len(Bid.objects.filter(auction=selected_auction)),
+        "current_bid": current_bid,
+        "winner": AuctionWinner.objects.filter(auction=selected_auction).first(),
+        "watchlist": Watchlist.objects.filter(user=request.user),
+    })
+
+
+def categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": Category.objects.all(),
+    })
+
+
+def category(request, category_id):
+    selected_category = Category.objects.get(pk=category_id)
+    return render(request, "auctions/category.html", {
+        "category": selected_category,
+        "auctions": Auction.objects.filter(category=selected_category),
+    })
+
+
+def watchlist(request):
+    auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
+    return render(request, "auctions/watchlist.html", {
+        "auctions": auctions,
     })
