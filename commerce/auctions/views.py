@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
-from .forms import AuctionForm, BidForm
+from .forms import AuctionForm, BidForm, CategoryForm
 
 
 def index(request):
@@ -143,8 +143,17 @@ def auction(request, auction_id):
 
 
 def categories(request):
+    if request.method == "POST" and request.user.is_authenticated:
+        form = CategoryForm(request.POST)
+
+        if form.is_valid():
+            name = form.cleaned_data["category"]
+            is_adult_only = form.cleaned_data["is_adult_only"]
+            Category.objects.create(category=name, is_adult_only=is_adult_only)
+
     return render(request, "auctions/categories.html", {
         "categories": Category.objects.all(),
+        "form": CategoryForm()
     })
 
 

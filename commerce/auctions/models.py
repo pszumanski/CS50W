@@ -10,7 +10,7 @@ class User(AbstractUser):
 
 class Category(models.Model):
     category = models.CharField(max_length=64, unique=True)
-    adult_only = models.BooleanField(default=True)
+    is_adult_only = models.BooleanField(default=True)
 
     def __str__(self):
         return self.category

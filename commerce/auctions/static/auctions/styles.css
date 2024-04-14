@@ -109,3 +109,10 @@ img {
     font-size: 1.1em;
 }
 
+.right {
+    text-align: right;
+    display: flex;
+    position: sticky;
+    justify-content: right;
+}
+

@@ -16,3 +16,8 @@ class AuctionForm(forms.Form):
 class BidForm(forms.Form):
     bid = forms.DecimalField(label='Bid', decimal_places=2, localize=True,
                              widget=forms.NumberInput(attrs={'placeholder': 'Starting bid'}))
+
+
+class CategoryForm(forms.Form):
+    category = forms.CharField(label='Category', widget=forms.TextInput(attrs={'placeholder': 'Category'}))
+    is_adult_only = forms.BooleanField(label='Adult only', initial=False, required=False)
