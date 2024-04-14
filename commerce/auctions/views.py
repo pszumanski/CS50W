@@ -8,11 +8,14 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
-from .forms import AuctionForm, BidForm, CategoryForm
+from .forms import AuctionForm, BidForm, CategoryForm, CommentForm
 
 
 def index(request):
     bids = {}
+    watched_auctions = []
+    if request.user.is_authenticated:
+        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     for auction in Auction.objects.all():
         bids[auction] = [auction.starting_bid]
     for bid in Bid.objects.all():
@@ -20,7 +23,8 @@ def index(request):
 
     return render(request, "auctions/index.html", {
         "auctions": Auction.objects.filter(is_active=True),
-        "bids": bids
+        "bids": bids,
+        "watchlist": watched_auctions,
     })
 
 
@@ -112,7 +116,6 @@ def auction(request, auction_id):
 
         if form.is_valid():
             selected_auction = Auction.objects.get(pk=auction_id)
-            current_bid = Bid.objects.filter(auction=selected_auction).last()
 
             new_bid = Bid(
                 bid=form.cleaned_data["bid"],
@@ -120,7 +123,13 @@ def auction(request, auction_id):
                 auction=selected_auction,
             )
 
-            if current_bid and not new_bid.bid > current_bid.bid:
+            current_price = None
+            if current_bid:
+                current_price = current_bid.bid
+            else:
+                current_price = selected_auction.starting_bid
+
+            if not new_bid.bid > current_price:
                 message = "Your bid must be higher than current bid."
             else:
                 new_bid.save()
@@ -128,18 +137,21 @@ def auction(request, auction_id):
         else:
             message = "Invalid bid."
 
-    watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
+    watched_auctions = []
+    if request.user.is_authenticated:
+        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     return render(request, "auctions/auction.html", {
-        "user": request.user,
-        "auction": selected_auction,
-        "comments": Comment.objects.filter(auction=selected_auction),
-        "bids_count": len(Bid.objects.filter(auction=selected_auction)),
-        "current_bid": current_bid,
-        "winner": AuctionWinner.objects.filter(auction=selected_auction).first(),
-        "watchlist": watched_auctions,
-        "message": message,
-        "form": BidForm(),
-    })
+    "user": request.user,
+    "auction": selected_auction,
+    "comments": Comment.objects.filter(auction=selected_auction),
+    "bids_count": len(Bid.objects.filter(auction=selected_auction)),
+    "current_bid": current_bid,
+    "winner": AuctionWinner.objects.filter(auction=selected_auction).first(),
+    "watchlist": watched_auctions,
+    "message": message,
+    "form": BidForm(),
+    "comment_form": CommentForm()
+})
 
 
 def categories(request):
@@ -161,7 +173,7 @@ def category(request, category_id):
     selected_category = Category.objects.get(pk=category_id)
     return render(request, "auctions/category.html", {
         "category": selected_category,
-        "auctions": Auction.objects.filter(active=True ,category=selected_category),
+        "auctions": Auction.objects.filter(is_active=True ,category=selected_category),
     })
 
 
@@ -194,4 +206,18 @@ def close_auction(request, auction_id):
             AuctionWinner.objects.create(auction=selected_auction, winner=winner)
         selected_auction.is_active = False
         selected_auction.save()
+    return HttpResponseRedirect(reverse("auction", args=[auction_id]))
+
+
+@login_required
+def comment(request, auction_id):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            comment_content = form.cleaned_data["comment"]
+            comment_author = request.user
+            selected_auction = Auction.objects.get(pk=auction_id)
+
+            Comment.objects.create(comment=comment_content, author=comment_author, auction=selected_auction)
     return HttpResponseRedirect(reverse("auction", args=[auction_id]))

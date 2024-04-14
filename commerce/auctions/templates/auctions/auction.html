@@ -3,7 +3,7 @@
 {% block body %}
     <h2>{{ auction.title }}</h2>
     {% if auction in watchlist %}
-        <label class="tag">Watchlist</label>
+        <label class="tag">Watchlist ❤️</label>
     {% endif %}
     {% if auction.category %}
         <label class="tag">{{ auction.category }}</label>
@@ -26,12 +26,12 @@
 
             {% if user.is_authenticated %}
                 {% if auction in watchlist %}
-                    <button class="watchlist-button" style="background-color: firebrick">
+                    <button class="watchlist-button margin-left" style="background-color: firebrick">
                         <a href="watchlist/{{ auction.id }}"> Remove from Watchlist </a>
                     </button>
                 {% else %}
-                    <button class="watchlist-button" style="background-color: dodgerblue">
-                        <a href="watchlist/{{ auction.id }}"> Add to Watchlist </a>
+                    <button class="watchlist-button margin-left" style="background-color: dodgerblue">
+                        <a href="watchlist/{{ auction.id }}"> Add to Watchlist ❤️</a>
                     </button>
                  {% endif %}
             {% endif %}
@@ -44,14 +44,17 @@
             {% endif %}
         {% endif %}
 
-        {% if auction.seller == user and auction.is_active%}
-            <button class="watchlist-button" style="background-color: firebrick">
-                <a href="close/{{ auction.id }}"> Close Auction </a>
-            </button>
-        {% endif %}
+        <p>
+            {% if auction.seller == user and auction.is_active%}
+                <button class="watchlist-button" style="background-color: firebrick">
+                    <a href="close/{{ auction.id }}"> Close Auction </a>
+                </button>
+            {% endif %}
+        </p>
+
 
         {% if not winner %}
-            {% if not user == auction.seller %}
+            {% if not user == auction.seller and user.is_authenticated %}
                 <form action="{% url 'auction' auction.id %}" method="post">
                     {% csrf_token %}
                     <span class="message">{{ message }}</span>
@@ -80,4 +83,25 @@
             </li>
         </ul>
     </div>
+    <div>
+        <h4>Comments</h4>
+        <div class="comments">
+            {% for comment in comments %}
+                <div class="comment">
+                    <h6>{{ comment.author }}</h6>
+                    {{ comment.comment }}
+                </div>
+            {% empty %}
+                <h5>No Comments</h5>
+            {% endfor %}
+        </div>
+        {% if user.is_authenticated %}
+            <form action="{% url 'comment' auction.id %}" method="post">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <input class="btn btn-primary" type="submit" value="Add Comment">
+            </form>
+        {% endif %}
+    </div>
+
 {% endblock %}

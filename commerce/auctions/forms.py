@@ -6,7 +6,7 @@ class AuctionForm(forms.Form):
     title = forms.CharField(label='Title', widget=forms.TextInput(attrs={'placeholder': 'Title'}))
     description = forms.CharField(label='Description', widget=forms.Textarea(attrs={'placeholder': 'Description'}))
     starting_bid = forms.DecimalField(label='Starting bid', decimal_places=2, localize=True,
-                                      widget=forms.NumberInput(attrs={'placeholder': 'Starting bid'}))
+                                      min_value=0, widget=forms.NumberInput(attrs={'placeholder': 'Starting bid'}))
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False)
     image_url = forms.URLField(label='Image', required=False,
                                widget=forms.URLInput(attrs={
@@ -21,3 +21,7 @@ class BidForm(forms.Form):
 class CategoryForm(forms.Form):
     category = forms.CharField(label='Category', widget=forms.TextInput(attrs={'placeholder': 'Category'}))
     is_adult_only = forms.BooleanField(label='Adult only', initial=False, required=False)
+
+
+class CommentForm(forms.Form):
+    comment = forms.CharField(label='Your Comment', widget=forms.Textarea(attrs={'placeholder': 'Comment'}))

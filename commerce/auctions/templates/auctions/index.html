@@ -4,18 +4,33 @@
     <h2>{% block header %}Active Listings{% endblock %}</h2>
         {% for auction in auctions %}
             <div class="auction">
-                <a href="auctions/{{ auction.id }}">{{ auction.title }}</a>
-                {{ auction.description }}
-                {{ auction.created_at }}
-                {% for key, value in bids.items %}
-                    {% if key == auction %}
-                        ${{ value|last }}
-                    {% endif %}
-                {% endfor %}
-                {% if auction.image_url %}
-                    <img src="{{ auction.image_url }}" alt="Picture of {{ auction.title }}">
-                {% endif %}
-            </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="col-md-5">
+                        {% if auction.image_url %}
+                            <img src="{{ auction.image_url }}" alt="Picture of {{ auction.title }}">
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-7">
+                        <h5><a href="auctions/{{ auction.id }}">{{ auction.title }}</a></h5>
+                        {% if auction in watchlist %}
+                            <label class="mini-tag">Watchlist ❤️</label>
+                        {% endif %}
+                        {% if auction.category %}
+                            <label class="mini-tag">{{ auction.category }}</label>
+                        {% endif %}
+                        {% for key, value in bids.items %}
+                            {% if key == auction %}
+                                <h5>Price: ${{ value|last }}</h5>
+                            {% endif %}
+                        {% endfor %}
+                        <p>{{ auction.description }}</p>
+                        <p class="created-at">Added on: {{ auction.created_at }}</p>
+                    </div>
+                  </div>
+                </div>
+                </div>
         {% empty %}
             <h3>No Auctions to show</h3>
         {% endfor %}

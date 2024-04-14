@@ -42,10 +42,10 @@ form p textarea {
 
 img {
     border: 2px solid gray;
-    border-radius: 7px;
-    max-height: 30vh;
+    border-radius: 12px;
+    max-height: 40vh;
     width: auto;
-    max-width: 50vw;
+    max-width: 40vw;
 }
 
 .solo-image {
@@ -57,11 +57,14 @@ img {
     border-radius: 12px;
 }
 
+.margin-left {
+    margin-left: 155px;
+}
+
 .watchlist-button {
     border: 2px solid black;
     border-radius: 10px;
     padding: 7px;
-    margin-left: 155px;
     margin-top: 10px;
     text-align: center;
 }
@@ -70,6 +73,17 @@ img {
     color: white;
     font-weight: bolder;
     font-size: 20px;
+}
+
+.mini-tag {
+    background-color: lightgreen;
+    border: 2px solid gray;
+    border-radius: 7px;
+    color: black;
+    font-weight: bolder;
+    text-align: center;
+    font-size: 0.7em;
+    padding: 5px;
 }
 
 .tag {
@@ -84,7 +98,7 @@ img {
 
 .header {
     font-weight: bolder;
-    font-size: 20px
+    font-size: 26px
 }
 
 .nav {
@@ -116,3 +130,32 @@ img {
     justify-content: right;
 }
 
+.comments {
+    padding: 12px;
+}
+
+.comment {
+    margin-bottom: 25px;
+    border: 2px solid gray;
+    border-radius: 7px;
+    padding: 12px;
+    background-color: hsl(0, 0%, 85%);
+}
+
+.auction {
+    margin-bottom: 25px;
+    border: 2px solid gray;
+    border-radius: 7px;
+    padding: 12px;
+    background-color: hsl(0, 0%, 85%);
+}
+
+.auction a {
+    color: black;
+}
+
+.created-at {
+    font-weight: lighter;
+    font-size: 0.8em;
+    color: hsl(0, 0%, 20%);
+}
