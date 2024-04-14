@@ -5,14 +5,9 @@
 
     <ul>
         {% for category in categories %}
-
-        <li>
-            <a href="categories/{{ category.id }}">{{ category }}</a>
-        </li>
-
+            <li>
+                <a href="categories/{{ category.id }}">{{ category }}</a>
+            </li>
         {% endfor %}
-
-        
-
     </ul>
 {% endblock %}

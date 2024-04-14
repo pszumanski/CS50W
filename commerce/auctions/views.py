@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
-from .forms import AuctionForm
+from .forms import AuctionForm, BidForm
 
 
 def index(request):
@@ -19,7 +19,7 @@ def index(request):
         bids[bid.auction].append(bid)
 
     return render(request, "auctions/index.html", {
-        "auctions": Auction.objects.all(),
+        "auctions": Auction.objects.filter(is_active=True),
         "bids": bids
     })
 
@@ -105,6 +105,30 @@ def new_auction(request):
 def auction(request, auction_id):
     selected_auction = Auction.objects.get(id=auction_id)
     current_bid = Bid.objects.filter(auction=selected_auction).last()
+    message = ""
+
+    if request.method == "POST" and request.user.is_authenticated:
+        form = BidForm(request.POST)
+
+        if form.is_valid():
+            selected_auction = Auction.objects.get(pk=auction_id)
+            current_bid = Bid.objects.filter(auction=selected_auction).last()
+
+            new_bid = Bid(
+                bid=form.cleaned_data["bid"],
+                bidder=request.user,
+                auction=selected_auction,
+            )
+
+            if current_bid and not new_bid.bid > current_bid.bid:
+                message = "Your bid must be higher than current bid."
+            else:
+                new_bid.save()
+                return HttpResponseRedirect(reverse("auction", args=[auction_id]))
+        else:
+            message = "Invalid bid."
+
+    watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     return render(request, "auctions/auction.html", {
         "user": request.user,
         "auction": selected_auction,
@@ -112,7 +136,9 @@ def auction(request, auction_id):
         "bids_count": len(Bid.objects.filter(auction=selected_auction)),
         "current_bid": current_bid,
         "winner": AuctionWinner.objects.filter(auction=selected_auction).first(),
-        "watchlist": Watchlist.objects.filter(user=request.user),
+        "watchlist": watched_auctions,
+        "message": message,
+        "form": BidForm(),
     })
 
 
@@ -126,12 +152,37 @@ def category(request, category_id):
     selected_category = Category.objects.get(pk=category_id)
     return render(request, "auctions/category.html", {
         "category": selected_category,
-        "auctions": Auction.objects.filter(category=selected_category),
+        "auctions": Auction.objects.filter(active=True ,category=selected_category),
     })
 
 
+@login_required
 def watchlist(request):
     auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     return render(request, "auctions/watchlist.html", {
         "auctions": auctions,
     })
+
+
+@login_required
+def add_to_watchlist(request, auction_id):
+    selected_auction = Auction.objects.get(pk=auction_id)
+    auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
+    if selected_auction in auctions:
+        Watchlist.objects.get(user=request.user, auction=selected_auction).delete()
+    else:
+        Watchlist.objects.create(user=request.user, auction=selected_auction)
+    return HttpResponseRedirect(reverse("auction", args=[auction_id]))
+
+
+@login_required
+def close_auction(request, auction_id):
+    selected_auction = Auction.objects.get(pk=auction_id)
+    if selected_auction.seller == request.user and selected_auction.is_active:
+        current_bid = Bid.objects.filter(auction=selected_auction).last()
+        winner = current_bid.bidder
+        if winner:
+            AuctionWinner.objects.create(auction=selected_auction, winner=winner)
+        selected_auction.is_active = False
+        selected_auction.save()
+    return HttpResponseRedirect(reverse("auction", args=[auction_id]))

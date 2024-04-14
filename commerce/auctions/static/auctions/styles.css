@@ -1,5 +1,5 @@
 body {
-    padding: 10px;
+    padding: 20px;
 }
 
 .center h2 {
@@ -55,5 +55,57 @@ img {
     display: inline-block;
     border: 4px solid gray;
     border-radius: 12px;
+}
+
+.watchlist-button {
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 7px;
+    margin-left: 155px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.watchlist-button a {
+    color: white;
+    font-weight: bolder;
+    font-size: 20px;
+}
+
+.tag {
+    background-color: lightgreen;
+    border: 2px solid gray;
+    border-radius: 7px;
+    color: black;
+    font-weight: bolder;
+    text-align: center;
+    padding: 5px;
+}
+
+.header {
+    font-weight: bolder;
+    font-size: 20px
+}
+
+.nav {
+    margin-top: 20px;
+}
+
+.nav-item {
+    margin-right: 15px;
+    border: 2px solid gray;
+    border-radius: 7px;
+    font-weight: 500;
+    background-color: lightgreen;
+}
+
+.nav-item a {
+    color: black
+}
+
+.message {
+    color: tomato;
+    font-weight: bolder;
+    font-size: 1.1em;
 }
 

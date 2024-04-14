@@ -11,3 +11,8 @@ class AuctionForm(forms.Form):
     image_url = forms.URLField(label='Image', required=False,
                                widget=forms.URLInput(attrs={
                                 'placeholder': 'Image URL'}))
+
+
+class BidForm(forms.Form):
+    bid = forms.DecimalField(label='Bid', decimal_places=2, localize=True,
+                             widget=forms.NumberInput(attrs={'placeholder': 'Starting bid'}))
