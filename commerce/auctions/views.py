@@ -1,14 +1,12 @@
-from datetime import datetime
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
 from .forms import AuctionForm, BidForm, CategoryForm, CommentForm
+from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
 
 
 def index(request):
@@ -155,33 +153,57 @@ def auction(request, auction_id):
 
 
 def categories(request):
+    watched_auctions = []
+    if request.user.is_authenticated:
+        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     if request.method == "POST" and request.user.is_authenticated:
         form = CategoryForm(request.POST)
 
         if form.is_valid():
             name = form.cleaned_data["category"]
             is_adult_only = form.cleaned_data["is_adult_only"]
-            Category.objects.create(category=name, is_adult_only=is_adult_only)
+            if not Category.objects.filter(category=name).first():
+                Category.objects.create(category=name, is_adult_only=is_adult_only)
 
     return render(request, "auctions/categories.html", {
         "categories": Category.objects.all(),
-        "form": CategoryForm()
+        "form": CategoryForm(),
+        "watchlist": watched_auctions
     })
 
 
 def category(request, category_id):
+    bids = {}
+    watched_auctions = []
+    if request.user.is_authenticated:
+        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
+    for auction in Auction.objects.all():
+        bids[auction] = [auction.starting_bid]
+    for bid in Bid.objects.all():
+        bids[bid.auction].append(bid)
     selected_category = Category.objects.get(pk=category_id)
     return render(request, "auctions/category.html", {
         "category": selected_category,
-        "auctions": Auction.objects.filter(is_active=True ,category=selected_category),
+        "auctions": Auction.objects.filter(is_active=True, category=selected_category),
+        "watchlist": watched_auctions,
+        "bids": bids,
     })
 
 
 @login_required
 def watchlist(request):
+    bids = {}
+    watched_auctions = []
     auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
+    watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
+    for auction in Auction.objects.all():
+        bids[auction] = [auction.starting_bid]
+    for bid in Bid.objects.all():
+        bids[bid.auction].append(bid)
     return render(request, "auctions/watchlist.html", {
         "auctions": auctions,
+        "watchlist": watched_auctions,
+        "bids": bids,
     })
 
 

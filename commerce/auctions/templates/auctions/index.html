@@ -13,7 +13,7 @@
                     </div>
 
                     <div class="col-md-7">
-                        <h5><a href="auctions/{{ auction.id }}">{{ auction.title }}</a></h5>
+                        <h5><a href="{% url 'auction' auction.id %}">{{ auction.title }}</a></h5>
                         {% if auction in watchlist %}
                             <label class="mini-tag">Watchlist ❤️</label>
                         {% endif %}
