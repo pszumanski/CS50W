@@ -1,5 +1,6 @@
 ## CS50W: Web Programming with Python and JavaScript
 
-Video showcases:
-- google-search: https://youtu.be/qe__gxun7PA
-- wiki: https://youtu.be/KpqrQ0He6iE
+#### Video showcases:
+- Google Search: https://youtu.be/qe__gxun7PA
+- Wiki: https://youtu.be/KpqrQ0He6iE
+- Commerce: https://youtu.be/e4dV3UzfqwI
