@@ -7,22 +7,14 @@ from django.urls import reverse
 
 from .forms import AuctionForm, BidForm, CategoryForm, CommentForm
 from .models import User, Auction, Category, Bid, Comment, AuctionWinner, Watchlist
+from .utils import get_bids, get_watchlist
 
 
 def index(request):
-    bids = {}
-    watched_auctions = []
-    if request.user.is_authenticated:
-        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
-    for auction in Auction.objects.all():
-        bids[auction] = [auction.starting_bid]
-    for bid in Bid.objects.all():
-        bids[bid.auction].append(bid)
-
     return render(request, "auctions/index.html", {
         "auctions": Auction.objects.filter(is_active=True),
-        "bids": bids,
-        "watchlist": watched_auctions,
+        "bids": get_bids(),
+        "watchlist": get_watchlist(request.user),
     })
 
 
@@ -135,9 +127,6 @@ def auction(request, auction_id):
         else:
             message = "Invalid bid."
 
-    watched_auctions = []
-    if request.user.is_authenticated:
-        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     return render(request, "auctions/auction.html", {
     "user": request.user,
     "auction": selected_auction,
@@ -145,7 +134,7 @@ def auction(request, auction_id):
     "bids_count": len(Bid.objects.filter(auction=selected_auction)),
     "current_bid": current_bid,
     "winner": AuctionWinner.objects.filter(auction=selected_auction).first(),
-    "watchlist": watched_auctions,
+    "watchlist": get_watchlist(request.user),
     "message": message,
     "form": BidForm(),
     "comment_form": CommentForm()
@@ -153,9 +142,6 @@ def auction(request, auction_id):
 
 
 def categories(request):
-    watched_auctions = []
-    if request.user.is_authenticated:
-        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
     if request.method == "POST" and request.user.is_authenticated:
         form = CategoryForm(request.POST)
 
@@ -168,42 +154,27 @@ def categories(request):
     return render(request, "auctions/categories.html", {
         "categories": Category.objects.all(),
         "form": CategoryForm(),
-        "watchlist": watched_auctions
+        "watchlist": get_watchlist(request.user),
     })
 
 
 def category(request, category_id):
-    bids = {}
-    watched_auctions = []
-    if request.user.is_authenticated:
-        watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
-    for auction in Auction.objects.all():
-        bids[auction] = [auction.starting_bid]
-    for bid in Bid.objects.all():
-        bids[bid.auction].append(bid)
     selected_category = Category.objects.get(pk=category_id)
     return render(request, "auctions/category.html", {
         "category": selected_category,
         "auctions": Auction.objects.filter(is_active=True, category=selected_category),
-        "watchlist": watched_auctions,
-        "bids": bids,
+        "watchlist": get_watchlist(request.user),
+        "bids": get_bids(),
     })
 
 
 @login_required
 def watchlist(request):
-    bids = {}
-    watched_auctions = []
     auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
-    watched_auctions = [watchlist_item.auction for watchlist_item in Watchlist.objects.filter(user=request.user)]
-    for auction in Auction.objects.all():
-        bids[auction] = [auction.starting_bid]
-    for bid in Bid.objects.all():
-        bids[bid.auction].append(bid)
     return render(request, "auctions/watchlist.html", {
         "auctions": auctions,
-        "watchlist": watched_auctions,
-        "bids": bids,
+        "watchlist": get_watchlist(request.user),
+        "bids": get_bids(),
     })
 
 
