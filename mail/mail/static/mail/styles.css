@@ -1,0 +1,64 @@
+textarea {
+    min-height: 400px;
+}
+
+.listed-email {
+    padding: 10px;
+    margin: 10px;
+    border: 3px solid #9e7aff;
+    border-radius: 12px;
+}
+
+.read {
+    background: #e3e3e3;
+}
+
+.email-body {
+    margin-top: 10px;
+    font-size: 1.1em;
+}
+
+.email-subject {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1.4em;
+}
+
+.opened-email {
+    padding: 10px;
+    padding-bottom: 50px;
+    border: 3px solid #9e7aff;
+    border-radius: 12px;
+}
+
+.archive-button {
+    border-radius: 12px;
+    padding: 3px;
+    padding-left: 7px;
+    padding-right: 7px;
+    margin-right: 20px;
+    font-size: 0.8em;
+    font-weight: bolder;
+}
+
+#reply-button {
+    border-radius: 12px;
+    border: 2px solid dodgerblue;
+    padding: 3px;
+    padding-left: 7px;
+    padding-right: 7px;
+    margin-right: 20px;
+    font-size: 0.8em;
+    font-weight: bolder;
+    color: dodgerblue;
+    background-color: white;
+}
+
+.right {
+    float: right;
+}
+
+.bold {
+    font-weight: bolder;
+    white-space: pre;
+}
