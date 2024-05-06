@@ -1,0 +1,16 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <div id="header"></div>
+    <div id="new-post" style="display: none">
+        <h4>New Post</h4>
+        <form id="new-post-form">
+            <div>
+                <textarea id="new-post-content"></textarea>
+            </div>
+            <button onclick="createPost()" id="new-post-button" type="submit">Post</button>
+        </form>
+    </div>
+    <div id="posts"></div>
+    <div id="pagination"></div>
+{% endblock %}
