@@ -11,31 +11,31 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" onclick="getPosts('all'); return false;" href="">Network</a>
+            <a class="navbar-brand" onclick="getPosts('all', 1); return false;" href="">Network</a>
           
             <div>
               <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" onclick="getUser({{ user.id }}); return false;" href=""><strong>{{ user.username }}</strong></a>
+                        <a class="nav-link" onclick="getProfile({{ user.id }}); return false;" href=""><strong>{{ user.username }}</strong></a>
                     </li>
                 {% endif %}
                 <li class="nav-item">
-                  <a class="nav-link" onclick="getPosts('all'); return false;" href="">All Posts</a>
+                  <a class="nav-link" onclick="getPosts('all', 1); return false;" href="">All Posts</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" onclick="getPosts('followed'); return false;" href="">Following</a>
+                        <a class="nav-link" onclick="getPosts('followed', 1); return false;" href="">Following</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                        <a class="nav-link" href="{% url 'logout' %}" >Log Out</a>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                        <a class="nav-link" href="" onclick="login(); return false;">Log In</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        <a class="nav-link" href="" onclick="register(); return false;">Register</a>
                     </li>
                 {% endif %}
               </ul>

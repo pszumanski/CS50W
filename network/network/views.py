@@ -3,13 +3,13 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Post
+from .models import User, Post, Follow, Like
+from .utils import render_posts, get_followed_users_ids, get_followers_amount, is_user_followable, is_user_unfollowable
 
 
 def index(request):
@@ -17,6 +17,7 @@ def index(request):
 
 
 def login_view(request):
+    print(request.POST)
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -59,18 +60,18 @@ def register(request):
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "network/register.html", {
+            return render(request, "network/index.html", {
                 "message": "Username already taken."
             })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "network/register.html")
+        return render(request, "network/index.html")
 
 
 @login_required
-@csrf_exempt
 def create_post(request):
+    print(request.POST)
     if request.method == "POST":
         post = Post()
 
@@ -87,36 +88,92 @@ def create_post(request):
 
 
 def get_posts(request, page):
-    posts = list(Post.objects.all().values())
-    # TODO: GET ALL POSTS
+    assert page >= 1
 
+    posts = Post.objects.all().order_by('-timestamp')
+    rendered_posts = render_posts(posts, page, request.user)
     return JsonResponse({
-        "posts": json.parse(posts)
+        "authenticated": request.user.is_authenticated,
+        "posts": rendered_posts.get("posts"),
+        "hasNext": rendered_posts.get("hasNext"),
+        "hasPrevious": rendered_posts.get("hasPrevious"),
     })
 
 
 @login_required
 def get_followed_posts(request, page):
-    pass
+    assert page >= 1
+
+    followed_users_ids = get_followed_users_ids(request.user)
+    posts = Post.objects.filter(author_id__in=followed_users_ids).order_by('-timestamp')
+    rendered_posts = render_posts(posts, page, request.user)
+    return JsonResponse({
+        "authenticated": request.user.is_authenticated,
+        "posts": rendered_posts.get("posts"),
+        "hasNext": rendered_posts.get("hasNext"),
+        "hasPrevious": rendered_posts.get("hasPrevious"),
+    })
 
 
 def get_user_profile(request, user_id):
-    pass
+    profile_user = User.objects.get(pk=user_id)
+    posts = Post.objects.filter(author_id=user_id).order_by('-timestamp')
+
+    return JsonResponse({
+        'username': profile_user.username,
+        'followers': get_followers_amount(profile_user),
+        'following': get_followed_users_ids(profile_user).count(),
+        'followable': is_user_followable(profile_user, request.user),
+        'unfollowable': is_user_unfollowable(profile_user, request.user),
+        'posts': render_posts(posts, 0, user_id).get("posts")
+    })
 
 
 @login_required
 def follow_user(request, user_id):
-    pass
+    following = User.objects.get(pk=user_id)
+
+    try:
+        follow = Follow.objects.get(follower=request.user, following=following)
+        follow.delete()
+    except Follow.DoesNotExist:
+        Follow.objects.create(follower=request.user, following=following)
+
+    return JsonResponse(data=None, status=200, safe=False)
 
 
 @login_required
 def edit_post(request, post_id):
-    pass
+    if request.method == "POST":
+        post = Post.objects.get(pk=post_id)
+
+        if post.author != request.user:
+            return JsonResponse(data=None, status=403, safe=False)
+
+        data = json.loads(request.body)
+        if data.get('content') is not None:
+            post.content = data['content']
+            post.save()
+
+        return JsonResponse(data=None, status=200, safe=False)
 
 
 @login_required
 def like_post(request, post_id):
-    pass
+    if request.method == "POST":
+        post = Post.objects.get(pk=post_id)
+
+        try:
+            like = Like.objects.get(user=request.user, post=post)
+            like.delete()
+            return JsonResponse(data={
+                "liked": False
+            }, status=200)
+        except Like.DoesNotExist:
+            Like.objects.create(user=request.user, post=post)
+            return JsonResponse(data={
+                "liked": True
+            }, status=200)
 
 
 def authenticated(request):
