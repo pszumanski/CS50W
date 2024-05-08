@@ -1,11 +1,113 @@
+#header {
+    font-size: 1.8em;
+    font-weight: bolder;
+}
+
+.auth-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    width: 100vw;
+}
+
+.form-group {
+    width: 30vw;
+    margin-left: 20vw;
+    margin-right: 20vw;
+}
+
+.body {
+    text-align: center;
+}
+
+button {
+    background-color: white;
+    border: 2px solid deepskyblue;
+    border-radius: 5px;
+    color: deepskyblue;
+    font-weight: bolder;
+    margin: 0;
+}
+
+
 #new-post-content {
-    width: 80%;
-    height: 75px;
+    width: 70vw;
+    height: 90px;
+    background-color: white;
+    border: 3px solid deepskyblue;
+    border-radius: 40px;
+    padding: 15px;
+    resize: none;
+}
+
+#new-post-content:focus {
+    background-color: #efefef;
+}
+
+.content {
+    white-space: pre-line;
+}
+
+.post {
+    border: 2px solid deepskyblue;
+    border-radius: 10px;
+    width: 60vw;
+    margin: 20px;
+    padding: 10px;
+}
+
+#posts {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    justify-content: center;
 }
 
 .liked-post {
-    background-color: dodgerblue;
+    background-color: deepskyblue;
+    border-color: dodgerblue;
+    color: white;
+}
+
+.unfollow-button {
+    background-color: deepskyblue;
+    border-color: dodgerblue;
+    color: white;
+}
+
+.timestamp {
+    font-size: .8em;
+    color: #4b4b4b;
+}
+
+.post-area {
+    width: 50vw;
+    border: 2px solid deepskyblue;
+    border-radius: 20px;
+    padding: 5px;
+    resize: none;
+}
+
+.user-link {
+    color: black;
+    font-size: 1.2em;
+}
+
+.user-link:hover {
+    color: deepskyblue;
+    text-decoration: none;
 }
 
 .likes-button{
+}
+
+#pagination {
+    margin-bottom: 30px;
+}
+
+#pagination button {
+    margin: 6px;
 }

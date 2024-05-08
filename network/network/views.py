@@ -84,7 +84,8 @@ def create_post(request):
         post.save()
 
         return JsonResponse(data=None, status=201, safe=False)
-    return JsonResponse(data=None, status=400, safe=False)
+    else:
+        return JsonResponse(data=None, status=400, safe=False)
 
 
 def get_posts(request, page):
@@ -92,11 +93,12 @@ def get_posts(request, page):
 
     posts = Post.objects.all().order_by('-timestamp')
     rendered_posts = render_posts(posts, page, request.user)
+
     return JsonResponse({
-        "authenticated": request.user.is_authenticated,
-        "posts": rendered_posts.get("posts"),
-        "hasNext": rendered_posts.get("hasNext"),
-        "hasPrevious": rendered_posts.get("hasPrevious"),
+        'authenticated': request.user.is_authenticated,
+        'posts': rendered_posts.get("posts"),
+        'hasNext': rendered_posts.get("hasNext"),
+        'hasPrevious': rendered_posts.get("hasPrevious"),
     })
 
 
@@ -107,11 +109,12 @@ def get_followed_posts(request, page):
     followed_users_ids = get_followed_users_ids(request.user)
     posts = Post.objects.filter(author_id__in=followed_users_ids).order_by('-timestamp')
     rendered_posts = render_posts(posts, page, request.user)
+
     return JsonResponse({
-        "authenticated": request.user.is_authenticated,
-        "posts": rendered_posts.get("posts"),
-        "hasNext": rendered_posts.get("hasNext"),
-        "hasPrevious": rendered_posts.get("hasPrevious"),
+        'authenticated': request.user.is_authenticated,
+        'posts': rendered_posts.get("posts"),
+        'hasNext': rendered_posts.get("hasNext"),
+        'hasPrevious': rendered_posts.get("hasPrevious"),
     })
 
 
@@ -125,7 +128,8 @@ def get_user_profile(request, user_id):
         'following': get_followed_users_ids(profile_user).count(),
         'followable': is_user_followable(profile_user, request.user),
         'unfollowable': is_user_unfollowable(profile_user, request.user),
-        'posts': render_posts(posts, 0, user_id).get("posts")
+        'posts': render_posts(posts, 0, request.user).get("posts"),
+        'authenticated': request.user.is_authenticated,
     })
 
 
@@ -166,17 +170,13 @@ def like_post(request, post_id):
         try:
             like = Like.objects.get(user=request.user, post=post)
             like.delete()
+
             return JsonResponse(data={
-                "liked": False
+                'liked': False
             }, status=200)
         except Like.DoesNotExist:
             Like.objects.create(user=request.user, post=post)
+
             return JsonResponse(data={
-                "liked": True
+                'liked': True
             }, status=200)
-
-
-def authenticated(request):
-    return JsonResponse({
-        "authenticated": request.user.is_authenticated
-    })

@@ -1,7 +1,6 @@
 from django.core.paginator import Paginator
-from django.http import JsonResponse
 
-from .models import User, Follow, Like
+from .models import Follow, Like
 
 
 def get_likes_of_post(post):

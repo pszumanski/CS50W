@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     newPostContent = document.querySelector('#new-post-content');
     pagination = document.querySelector('#pagination');
     csrf = document.querySelector('input[name="csrfmiddlewaretoken"]');
-    getPosts('all', 1)
+    getPosts('all', 1);
 })
 
 function getPosts(type, page) {
@@ -33,7 +33,7 @@ function getPosts(type, page) {
         newPost.style.display = 'block';
         }
 
-        renderPosts(response, type, page)
+        renderPosts(response, type, page);
     });
 }
 
@@ -43,44 +43,45 @@ function getProfile(userId) {
     fetch(`user/${userId}`)
         .then(response => response.json())
         .then(response => {
+            changeHeader(response.username)
             userProfile.innerHTML = `
-<p>${response.username}</p>
-<p>Followers: ${response.followers}</p>
-<p>Following: ${response.following}</p>
+<p>Followers: <span id="followers">${response.followers}</span> | Following: ${response.following}</p>
 <p id="follow"></p>
 `;
+            const followers = userProfile.querySelector('#followers');
+            const followButton = document.createElement('button');
+            followButton.addEventListener('click', () => {
+                    let followersAmount = parseInt(followers.textContent);
+                    console.log(followersAmount);
+                    fetch(`user/follow/${userId}`)
+                        .then(response => {
+                            if (followButton.textContent === 'Follow') {
+                                followButton.classList.add('unfollow-button');
+                                followButton.textContent = 'Unfollow';
+                                followers.textContent = String(followersAmount + 1);
+                            } else {
+                                followButton.classList.remove('unfollow-button');
+                                followButton.textContent = 'Follow';
+                                followers.textContent = String(followersAmount - 1);
+                            }
+                        });
+                });
 
             if (response.followable) {
-                const followButton = document.createElement('button');
-                followButton.classList.add('follow-button');
                 followButton.textContent = 'Follow';
-
-                followButton.addEventListener('click', () => {
-                    fetch(`user/follow/${userId}`)
-                        .then(response => getProfile(userId));
-                })
-
                 userProfile.querySelector('#follow').appendChild(followButton);
             } else if (response.unfollowable) {
-                const unfollowButton = document.createElement('button');
-                unfollowButton.classList.add('unfollow-button');
-                unfollowButton.textContent = 'Unfollow';
-
-                unfollowButton.addEventListener('click', () => {
-                    fetch(`user/follow/${userId}`)
-                        .then(response => getProfile(userId));
-                })
-
-                userProfile.querySelector('#follow').appendChild(unfollowButton);
+                followButton.classList.add('unfollow-button');
+                followButton.textContent = 'Unfollow';
+                userProfile.querySelector('#follow').appendChild(followButton);
             }
             userProfile.style.display = 'block';
-            renderPosts(response)
+            renderPosts(response);
         })
 }
 
 function createPost() {
     const content = newPostContent.value;
-    console.log(csrf.value)
 
     fetch("posts/new", {
     method: 'POST',
@@ -95,23 +96,20 @@ function createPost() {
 
 function editPost(postId) {
     const post = document.querySelector(`[data-postId="${postId}"]`);
+    const editButton = post.querySelector('#edit-button');
 
     const postContentArea = post.querySelector(`.content`);
-    const postContent = postContentArea.innerHTML;
+    const postContent = postContentArea.textContent;
     const postEditArea = document.createElement('textarea');
     postEditArea.classList.add('post-area');
     postEditArea.value = postContent;
 
     postContentArea.innerHTML = '';
     postContentArea.appendChild(postEditArea);
-    post.querySelector('#edit-button').style.display = 'none';
 
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save';
-    saveButton.classList.add('save-button');
-    saveButton.addEventListener('click', event => {
-        const newPostContent = postEditArea.value;
-
+    editButton.textContent = 'Save';
+    editButton.onclick = () => {
+        const newPostContent = postEditArea.value
         fetch(`posts/edit/${postId}`, {
             method: 'POST',
             headers: {
@@ -120,15 +118,13 @@ function editPost(postId) {
             },
             body: JSON.stringify({
                 content: newPostContent,
-                test: "xd"
             })})
         .then(response => {
             postContentArea.innerHTML = `<p id="content">${newPostContent}</p>`;
-            post.querySelector('#edit-button').style.display = 'block';
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => editPost(postId);
         });
-    });
-
-    postContentArea.appendChild(saveButton);
+    }
 }
 
 function likePost(postId) {
@@ -152,11 +148,11 @@ function likePost(postId) {
                 likesButton.classList.remove('liked-post');
                 likesButton.textContent = '❤️ ' + (previousLikes - 1);
             }
-        })
+        });
 }
 
 function renderPosts(response, type, page) {
-    let posts = response.posts
+    let posts = response.posts;
 
     posts.forEach(post => {
                 const postElement = document.createElement('div');
@@ -172,7 +168,7 @@ function renderPosts(response, type, page) {
 `;
 
                 if (post.is_editable) {
-                    postElement.querySelector('.edit').innerHTML = `<button class="edit-button" id="edit-button" onclick="editPost(${post.id})">Edit</button>`
+                    postElement.querySelector('.edit').innerHTML = `<button class="edit-button" id="edit-button" onclick="editPost(${post.id})">Edit</button>`;
                 }
 
                 if (!response.authenticated) {
@@ -192,20 +188,20 @@ function renderPosts(response, type, page) {
                 const previousButton = document.createElement('button');
                 previousButton.innerHTML = '⬅️';
                 previousButton.addEventListener('click', event => {
-                    getPosts(type, page - 1)
+                    getPosts(type, page - 1);
                 })
 
-                pagination.appendChild(previousButton)
+                pagination.appendChild(previousButton);
             }
 
             if (response.hasNext) {
                 const nextButton = document.createElement('button');
                 nextButton.innerHTML = '➡️';
                 nextButton.addEventListener('click', event => {
-                    getPosts(type, page + 1)
+                    getPosts(type, page + 1);
                 })
 
-                pagination.appendChild(nextButton)
+                pagination.appendChild(nextButton);
             }
 }
 

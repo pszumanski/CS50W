@@ -15,5 +15,4 @@ urlpatterns = [
     path("posts/like/<int:post_id>", views.like_post, name="like_post"),
     path("user/<int:user_id>", views.get_user_profile, name="get_user_profile"),
     path("user/follow/<int:user_id>", views.follow_user, name="follow_user"),
-    path("authenticated", views.authenticated, name="authenticated"),
 ]
