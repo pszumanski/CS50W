@@ -17,7 +17,6 @@ def index(request):
 
 
 def login_view(request):
-    print(request.POST)
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -71,7 +70,6 @@ def register(request):
 
 @login_required
 def create_post(request):
-    print(request.POST)
     if request.method == "POST":
         post = Post()
 

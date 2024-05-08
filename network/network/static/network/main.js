@@ -52,7 +52,6 @@ function getProfile(userId) {
             const followButton = document.createElement('button');
             followButton.addEventListener('click', () => {
                     let followersAmount = parseInt(followers.textContent);
-                    console.log(followersAmount);
                     fetch(`user/follow/${userId}`)
                         .then(response => {
                             if (followButton.textContent === 'Follow') {
